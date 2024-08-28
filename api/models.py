@@ -17,8 +17,8 @@ class ApiMethod(models.Model):
     test_code = models.TextField(max_length=512)
     code_result = models.TextField(max_length=512)
 
-class ApiParams(models.Model):
-    api_method = models.ForeignKey(ApiMethod,on_delete=models.CASCADE)
+class ApiParam(models.Model):
+    api_method = models.ForeignKey(ApiMethod, on_delete=models.CASCADE)
     language = models.CharField(
         max_length=10,
         choices=language_choices,
