@@ -7,7 +7,7 @@ from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib import messages
 
 from .forms import *
-from .models import language_choices
+from .models import *
 from base.models import Company
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -22,7 +22,7 @@ def signup(request):
     lang = request.GET.get('lang', 'en')
     if lang not in [p[0] for p in language_choices]:
         lang = 'en'
-
+    api_methods = ApiMethod.objects.filter(language=lang)
     company_obj = Company.objects.get(language=lang)
     if request.method == 'POST':
         form = SignupForm(request.POST)
@@ -32,14 +32,14 @@ def signup(request):
             return redirect('login')
     else:
         form = SignupForm()
-    return render(request, 'signup.html', {'form': form, 'company': company_obj})
+    return render(request, 'signup.html', {'form': form, 'company': company_obj, 'api_methods': api_methods})
 
 
 def login(request):
     lang = request.GET.get('lang', 'en')
     if lang not in [p[0] for p in language_choices]:
         lang = 'en'
-
+    api_methods = ApiMethod.objects.filter(language=lang)
     company_obj = Company.objects.get(language=lang)
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
@@ -50,7 +50,7 @@ def login(request):
             return redirect(next_url)
     else:
         form = LoginForm()
-    return render(request, 'login.html', {'form': form, 'company': company_obj})
+    return render(request, 'login.html', {'form': form, 'company': company_obj, 'api_methods': api_methods})
 
 
 def logout_view(request):
@@ -60,8 +60,13 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
+    lang = request.GET.get('lang', 'en')
+    if lang not in [p[0] for p in language_choices]:
+        lang = 'en'
+    company_obj = Company.objects.get(language=lang)
+    api_methods = ApiMethod.objects.filter(language=lang)
     userAPI = UserAPI.objects.get(user=request.user)
-    return render(request, 'profile.html', {'userAPI': userAPI})
+    return render(request, 'profile.html', {'userAPI': userAPI, 'company': company_obj, 'api_methods': api_methods})
 
 
 def convert_image_to_numpy_array(image_file):
@@ -71,11 +76,12 @@ def convert_image_to_numpy_array(image_file):
 
     return image_array
 
+
 @csrf_exempt
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def endpoint(request):
+def classify(request):
     user = request.user
     # Check if the image is in the request
     image = request.FILES.get('image')
@@ -87,8 +93,8 @@ def endpoint(request):
     if not method:
         return JsonResponse({'error': 'No method provided.'}, status=400)
 
-    if method == "OCRPicture":
-        pass
+    # TODO: parse the params and call the classify method and make a valid json response in the dict format
+    res = {}
 
     userAPI = UserAPI.objects.get(user=user)
     if userAPI.tokens <= 0:
@@ -100,5 +106,25 @@ def endpoint(request):
     # Example: save the image, perform an action based on the method, etc.
 
     # Example response after processing
-    return JsonResponse({'success': 'Image processed successfully.', 'image size': image_array.shape, 'method': method},
+    return JsonResponse({'success': True, **res},
                         status=200)
+
+
+def method(request, pk):
+    lang = request.GET.get('lang', 'en')
+    if lang not in [p[0] for p in language_choices]:
+        lang = 'en'
+    api_method = get_object_or_404(ApiMethod, pk=pk)
+    company_obj = Company.objects.get(language=lang)
+    api_methods = ApiMethod.objects.filter(language=lang)
+    return render(request, 'document.html',
+                  {'company': company_obj, 'api_method': api_method, 'api_methods': api_methods})
+
+
+def api_method_list(request):
+    lang = request.GET.get('lang', 'en')
+    if lang not in [p[0] for p in language_choices]:
+        lang = 'en'
+    company_obj = Company.objects.get(language=lang)
+    api_methods = ApiMethod.objects.filter(language=lang)
+    return render(request, 'api_list.html', {'company': company_obj, 'api_methods': api_methods})

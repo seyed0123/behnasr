@@ -45,13 +45,11 @@
                   <li><a href="{% url 'logout' %}">Logout</a></li>
                   <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
               {% endif %}
-            <li><a href="#portfolio">Document</a></li>
-            <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <li class="dropdown"><a href="{% url 'api_list' %}"><span>API</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
               <ul>
-                <li><a href="#">Dropdown 1</a></li>
-                <li><a href="#">Dropdown 2</a></li>
-                <li><a href="#">Dropdown 3</a></li>
-                <li><a href="#">Dropdown 4</a></li>
+                  {% for api_method in api_methods %}
+                      <li><a href="{% url 'view_method' api_method.pk %}">{{ api_method.title }}</a></li>
+                  {% endfor %}
               </ul>
             </li>
            <li><a href="{% url 'index' %}">Home</a></li>

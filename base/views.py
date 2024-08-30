@@ -1,4 +1,6 @@
 from django.shortcuts import render, get_object_or_404
+
+from api.models import ApiMethod
 from .models import *
 
 
@@ -16,10 +18,12 @@ def index(request):
     members = Member.objects.filter(language=lang)
     prices = Pricing.objects.filter(language=lang)
     customers = Customer.objects.all()
+    api_methods = ApiMethod.objects.filter(language=lang)
 
     return render(request, 'index.html',
                   {'company': company_obj, 'about_list': about_list, 'services': services, 'products': products,
-                   'categories': categories, 'members': members, 'prices': prices, 'customers': customers})
+                   'categories': categories, 'members': members, 'prices': prices, 'customers': customers,
+                   'api_methods': api_methods})
 
 
 def view_product(request, pk=None):
@@ -28,5 +32,7 @@ def view_product(request, pk=None):
         lang = 'en'
     product = get_object_or_404(Product, pk=pk)
     company_obj = Company.objects.get(language=lang)
+    api_methods = ApiMethod.objects.filter(language=lang)
 
-    return render(request, 'portfolio-details.html', {'company': company_obj, 'product': product})
+    return render(request, 'portfolio-details.html',
+                  {'company': company_obj, 'product': product, 'api_methods': api_methods})
