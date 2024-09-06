@@ -11,7 +11,7 @@ class ApiCaller():
         }
         self.url = url
 
-    def clasify(self, image_path):
+    def clasify(self, image_path, save_path='output_image.png'):
         method = 'classify'
         files = {
             'image': open(image_path, 'rb')
@@ -22,8 +22,14 @@ class ApiCaller():
             'method': method
         }
         response = requests.post(self.url + '/api/endpoint/', headers=self.headers, files=files, data=data)
-        print(response.status_code)
-        print(response.json())
+        if response.status_code == 200:
+            # Save the image from the response content
+            with open(save_path, 'wb') as f:
+                f.write(response.content)
+            print(f"Image saved to {save_path}")
+            print(response.headers)
+        else:
+            print(f"Error: {response.status_code}")
 
 
 o = ApiCaller('de674f9463370d0e56a071dcd089279d0adda7c4', 'localhost:8000')

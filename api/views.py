@@ -1,3 +1,5 @@
+import io
+
 import numpy as np
 from PIL import Image
 from io import BytesIO
@@ -9,7 +11,7 @@ from django.contrib import messages
 from .forms import *
 from .models import *
 from base.models import Company
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -90,11 +92,11 @@ def classify(request):
     image_array = convert_image_to_numpy_array(image)
     # Check if the method is in the request
     method = request.POST.get('method')
-    if not method:
-        return JsonResponse({'error': 'No method provided.'}, status=400)
+    # if not method:
+    #     return JsonResponse({'error': 'No method provided.'}, status=400)
 
     # TODO: parse the params and call the classify method and make a valid json response in the dict format
-    res = {}
+    res = {'shape': image_array.shape, 'method': method}
 
     userAPI = UserAPI.objects.get(user=user)
     if userAPI.tokens <= 0:
@@ -104,10 +106,17 @@ def classify(request):
     userAPI.save()
     # Process the image and method here
     # Example: save the image, perform an action based on the method, etc.
+    processed_image = Image.fromarray(image_array)
+    buf = io.BytesIO()
+    processed_image.save(buf, format='PNG')
+    image_bytes = buf.getvalue()
 
-    # Example response after processing
-    return JsonResponse({'success': True, **res},
-                        status=200)
+    # Create a response that includes the image and additional data
+    response = HttpResponse(image_bytes, content_type='image/png')
+    response['Shape'] = res['shape']  # Example of adding extra data to headers
+    response['Method'] = res['method']
+
+    return response
 
 
 def method(request, pk):
@@ -117,8 +126,9 @@ def method(request, pk):
     api_method = get_object_or_404(ApiMethod, pk=pk)
     company_obj = Company.objects.get(language=lang)
     api_methods = ApiMethod.objects.filter(language=lang)
+    key = UserAPI.objects.get(user=request.user).key
     return render(request, 'document.html',
-                  {'company': company_obj, 'api_method': api_method, 'api_methods': api_methods})
+                  {'company': company_obj, 'api_method': api_method, 'api_methods': api_methods, 'key': key})
 
 
 def api_method_list(request):
