@@ -12,18 +12,19 @@ def index(request):
 
     company_obj = Company.objects.get(language=lang)
     about_list = About_item.objects.filter(language=lang)
-    services = Service.objects.filter(language=lang)
+    services = Service.objects.filter(language=lang).order_by('order')
     products = Product.objects.filter(language=lang)
-    categories = list(Product.objects.values('category').distinct())
-    members = Member.objects.filter(language=lang)
+    categories = list(Product.objects.filter(language=lang).values('category').distinct())
+    members = Member.objects.filter(language=lang).order_by('order')
     prices = Pricing.objects.filter(language=lang)
     customers = Customer.objects.all()
+    informations = Information.objects.filter(language=lang)
     api_methods = ApiMethod.objects.filter(language=lang)
 
-    return render(request, 'index.html',
+    return render(request, f'index-{lang}.html',
                   {'company': company_obj, 'about_list': about_list, 'services': services, 'products': products,
                    'categories': categories, 'members': members, 'prices': prices, 'customers': customers,
-                   'api_methods': api_methods})
+                   'api_methods': api_methods, 'informations': informations, 'lang':lang})
 
 
 def view_product(request, pk=None):
@@ -34,5 +35,5 @@ def view_product(request, pk=None):
     company_obj = Company.objects.get(language=lang)
     api_methods = ApiMethod.objects.filter(language=lang)
 
-    return render(request, 'portfolio-details.html',
-                  {'company': company_obj, 'product': product, 'api_methods': api_methods})
+    return render(request, f'portfolio-details-{lang}.html',
+                  {'company': company_obj, 'product': product, 'api_methods': api_methods, 'lang':lang})

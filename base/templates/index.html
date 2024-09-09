@@ -79,7 +79,8 @@
   <main class="main">
 
     <!-- Hero Section -->
-    <section id="hero" class="hero section light-background">
+   <section id="hero" class="hero section light-background" style="background-image: url('{{ company.banner_image.url }}'); background-position: top left;">
+
 
       <div class="container">
         <div class="row gy-4">
@@ -102,22 +103,15 @@
       <div class="container">
 
         <div class="row gy-4 gx-2">
-
-          <div class="col-xl-6 col-md-12 d-flex" data-aos="fade-up" data-aos-delay="100">
-            <div class="service-item position-relative">
-              <h4><a href="" class="stretched-link">Extract meaningful information from unstructured data</a></h4>
-              <p>Break down data barriers with Nanonets AI—extract valuable information from documents, emails, tickets or databases. Transform unstructured data across multiple sources into actionable insights.</p>
-                <img class="img-fluid" src="{% static 'card-1.png' %}">
-            </div>
-          </div><!-- End Service Item -->
-
-          <div class="col-xl-6 col-md-12 d-flex" data-aos="fade-up" data-aos-delay="200">
-            <div class="service-item position-relative">
-              <h4><a href="" class="stretched-link">Automate any complex business processes with AI</a></h4>
-              <p>Automate even the most complex manual workflows with Nanonets' no-code platform. Our learnable decision engines equip your team with the tools they need to make faster, more informed decisions.</p>
-            <img class="img-fluid" src="{% static 'card-2.png' %}">
-            </div>
-          </div><!-- End Service Item -->
+            {% for information in informations %}
+                <div class="col-xl-6 col-md-12 d-flex" data-aos="fade-up" data-aos-delay="100">
+                    <div class="service-item position-relative">
+                      <h4><a href="" class="stretched-link">{{ information.title}}</a></h4>
+                      <p>{{ information.description}}</p>
+                        <img class="img-fluid" src="{{ information.image.url }}">
+                    </div>
+                  </div><!-- End Service Item -->
+            {% endfor %}
 
 {#          <div class="col-xl-3 col-md-6 d-flex" data-aos="fade-up" data-aos-delay="300">#}
 {#            <div class="service-item position-relative">#}
@@ -435,17 +429,31 @@
               {% endfor %}
           </ul><!-- End Portfolio Filters -->
 
-          <div class="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="200">
+          <div class="row g-4 isotope-container" data-aos="fade-up" data-aos-delay="200">
             {% for product in products %}
-                <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-{{ product.category }}">
-                  <img src="{{ product.image.url }}" class="img-fluid" alt="">
-                  <div class="portfolio-info">
-                    <h4>{{ product.title}}</h4>
-                    <p>{{  product.description }}</p>
-                    <a href="{{ product.image.url }}" title="{{ product.title}}" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
-                    <a href="{% url 'view_product' product.pk %}" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
+{#                <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-{{ product.category }}">#}
+{#                  <img src="{{ product.image.url }}" class="img-fluid" alt="">#}
+{#                  <div class="portfolio-info">#}
+{#                    <h4>{{ product.title}}</h4>#}
+{#                    <p>{{  product.description }}</p>#}
+{#                    <a href="{{ product.image.url }}" title="{{ product.title}}" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>#}
+{#                    <a href="{% url 'view_product' product.pk %}" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>#}
+{#                  </div>#}
+{#                </div><!-- End Portfolio Item -->#}
+                <div class="card mb-3 col-lg-4 col-md-6 portfolio-item isotope-item filter-{{ product.category }} p-2" >
+                  <div class="row g-0">
+                    <div class="col-md-4">
+                      <img src="{{ product.image.url }}" class="img-fluid rounded-start" alt="{{product.title}}">
+                    </div>
+                    <div class="col-md-8">
+                      <div class="card-body">
+                        <h5 class="card-title">{{ product.title}}</h5>
+                        <p class="card-text">{{ product.short_description}}</p>
+                          <p class="card-text"><a href="{% url 'view_product' product.pk %}" title="More Details" class="details-link"><button class="btn btn-outline-secondary">View</button></a></p>
+                      </div>
+                    </div>
                   </div>
-                </div><!-- End Portfolio Item -->
+                </div>
             {% endfor %}
 
           </div><!-- End Portfolio Container -->
@@ -472,13 +480,18 @@
                 <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="100">
                 <div class="team-member">
                   <div class="member-img">
-                    <img src="{{member.image.url}}" class="img-fluid" alt="">
-                    <div class="social">
-{#                      <a href=""><i class="bi bi-twitter-x"></i></a>#}
-{#                      <a href=""><i class="bi bi-facebook"></i></a>#}
-{#                      <a href=""><i class="bi bi-instagram"></i></a>#}
-                      <a href="{{ member.linkedin_link }}"><i class="bi bi-linkedin"></i></a>
-                    </div>
+                    <img src="{{member.image.url}}" class="img-fluid" alt="{{ member.name }}">
+                       {% if member.linkedin_link %}
+                            <div class="social">
+        {#                      <a href=""><i class="bi bi-twitter-x"></i></a>#}
+        {#                      <a href=""><i class="bi bi-facebook"></i></a>#}
+        {#                      <a href=""><i class="bi bi-instagram"></i></a>#}
+
+                                    <a href="{{ member.linkedin_link }}"><i class="bi bi-linkedin"></i></a>
+
+
+                            </div>
+                      {% endif %}
                   </div>
                   <div class="member-info">
                     <h4>{{ member.name}}</h4>
@@ -503,8 +516,7 @@
                 <div class="col-xl-3 col-lg-6" data-aos="fade-up" data-aos-delay="100">
                 <div class="pricing-item">
                   <h3>{{ price.title }}</h3>
-                  <h4>{{ price.number_token }} <span>tokens</span></h4>
-                  <h4><sup>$</sup>{{ price.price }}</h4>
+                  <h4><sup>$</sup>{{ price.price }}<span>/per page</span></h4>
                   <p>
                     {{ price.description}}
                   </p>

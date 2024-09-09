@@ -10,6 +10,7 @@ language_choices = [
 class Company(models.Model):
     name = models.CharField(max_length=50)
     slogan = models.CharField(max_length=250)
+    banner_image = models.ImageField(upload_to='media/', default='media/hero-bg.jpg')
     image = models.ImageField(upload_to='media/')
     about_up = models.TextField()
     about_down = models.TextField()
@@ -21,7 +22,7 @@ class Company(models.Model):
     address = models.CharField(max_length=250)
     phone = models.CharField(max_length=250)
     email = models.EmailField(max_length=250)
-    video = models.FileField(upload_to='media/',null=True)
+    video = models.FileField(upload_to='media/', blank=True, null=True)
 
 
 class About_item(models.Model):
@@ -31,7 +32,7 @@ class About_item(models.Model):
         max_length=10,
         choices=language_choices,
     )
-    bootstrap_icon = models.CharField(max_length=100, null=True, default='bi-diagram-3')
+    bootstrap_icon = models.CharField(max_length=100, blank=True, default='bi-diagram-3')
 
 
 class Customer(models.Model):
@@ -52,6 +53,7 @@ class Service(models.Model):
 
 class Product(models.Model):
     title = models.CharField(max_length=250)
+    short_description = models.TextField(max_length=1024, blank=True)
     description = models.TextField(max_length=1024)
     language = models.CharField(
         max_length=10,
@@ -68,7 +70,7 @@ class Member(models.Model):
         max_length=10,
         choices=language_choices,
     )
-    linkedin_link = models.CharField(max_length=250, null=True)
+    linkedin_link = models.CharField(max_length=250, null=True, blank=True)
     image = models.ImageField(upload_to='media/members')
     order = models.PositiveIntegerField(default=0)
 
@@ -76,8 +78,17 @@ class Member(models.Model):
 class Pricing(models.Model):
     title = models.CharField(max_length=250)
     description = models.TextField(max_length=1024)
-    number_token = models.IntegerField()
-    price = models.FloatField()
+    price = models.FloatField(blank=True)
+    language = models.CharField(
+        max_length=10,
+        choices=language_choices,
+    )
+
+
+class Information(models.Model):
+    title = models.CharField(max_length=250)
+    description = models.TextField(max_length=1024)
+    image = models.ImageField(upload_to='media/information')
     language = models.CharField(
         max_length=10,
         choices=language_choices,
