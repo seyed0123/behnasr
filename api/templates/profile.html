@@ -1,18 +1,18 @@
 {% extends "base.html" %}
-
-{% block title %}Dashboard{% endblock %}
+{% load i18n %}
+{% block title %}{% trans 'Dashboard' %}{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-5 text-center text-primary">Dashboard</h2>
+    <h2 class="mb-5 text-center text-primary">{% trans 'Dashboard' %}</h2>
     <div class="shadow p-5 bg-white rounded">
         <div class="row mb-4">
             <div class="col-md-5 m-2 text-center">
-                <div class="font-weight-bold text-secondary">Your Remaining Tokens:</div>
+                <div class="font-weight-bold text-secondary">{% trans 'Your Remaining Tokens' %}:</div>
                 <div class="display-4 text-success">{{ userAPI.tokens }}</div>
             </div>
             <div class="col-md-5 m-2 text-center">
-                <div class="font-weight-bold text-secondary">Your API Key:</div>
+                <div class="font-weight-bold text-secondary">{% trans 'Your API Key' %}:</div>
                 <div class="alert alert-info mt-2" style="word-break: break-all;">{{ userAPI.key }}</div>
             </div>
         </div>

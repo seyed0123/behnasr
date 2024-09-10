@@ -7,7 +7,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib import messages
+from django.utils import translation
 
+from apiwebsite import settings
 from .forms import *
 from .models import *
 from base.models import Company
@@ -16,6 +18,13 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import authentication_classes, permission_classes, api_view
+
+
+def active_lang(req, html, content, lang):
+    translation.activate(lang)
+    response = render(req, html, content)
+    response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang)
+    return response
 
 
 # Create your views here.
@@ -34,7 +43,8 @@ def signup(request):
             return redirect('login')
     else:
         form = SignupForm()
-    return render(request, 'signup.html', {'form': form, 'company': company_obj, 'api_methods': api_methods})
+    return active_lang(request, 'signup.html',
+                       {'form': form, 'company': company_obj, 'api_methods': api_methods, 'lang': lang}, lang)
 
 
 def login(request):
@@ -52,7 +62,8 @@ def login(request):
             return redirect(next_url)
     else:
         form = LoginForm()
-    return render(request, 'login.html', {'form': form, 'company': company_obj, 'api_methods': api_methods})
+    return active_lang(request, 'login.html',
+                       {'form': form, 'company': company_obj, 'api_methods': api_methods, 'lang': lang}, lang)
 
 
 def logout_view(request):
@@ -68,7 +79,8 @@ def dashboard(request):
     company_obj = Company.objects.get(language=lang)
     api_methods = ApiMethod.objects.filter(language=lang)
     userAPI = UserAPI.objects.get(user=request.user)
-    return render(request, 'profile.html', {'userAPI': userAPI, 'company': company_obj, 'api_methods': api_methods})
+    return active_lang(request, 'profile.html',
+                       {'userAPI': userAPI, 'company': company_obj, 'api_methods': api_methods, 'lang': lang}, lang)
 
 
 def convert_image_to_numpy_array(image_file):
@@ -127,8 +139,10 @@ def method(request, pk):
     company_obj = Company.objects.get(language=lang)
     api_methods = ApiMethod.objects.filter(language=lang)
     key = UserAPI.objects.get(user=request.user).key
-    return render(request, 'document.html',
-                  {'company': company_obj, 'api_method': api_method, 'api_methods': api_methods, 'key': key})
+
+    return active_lang(request, 'document.html',
+                       {'company': company_obj, 'api_method': api_method, 'api_methods': api_methods, 'key': key,
+                        'lang': lang}, lang)
 
 
 def api_method_list(request):
@@ -137,4 +151,5 @@ def api_method_list(request):
         lang = 'en'
     company_obj = Company.objects.get(language=lang)
     api_methods = ApiMethod.objects.filter(language=lang)
-    return render(request, 'api_list.html', {'company': company_obj, 'api_methods': api_methods})
+    return active_lang(request, 'api_list.html', {'company': company_obj, 'api_methods': api_methods, 'lang': lang},
+                       lang)

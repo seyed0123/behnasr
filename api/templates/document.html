@@ -1,14 +1,16 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 {% block title %}
-    Document
+
+    {% trans 'Document' %}
 {% endblock %}
 {% block extra_head %}
 <link href="{% static 'prism.css' %}" rel="stylesheet" />
 {% endblock %}
 {% block content%}
     <div class="container my-5">
-        <h1 class="mb-4 text-center">API Documentation</h1>
+        <h1 class="mb-4 text-center">{% trans 'API Documentation' %}</h1>
         <div class="card mb-5 shadow-sm">
             <div class="card-header bg-primary text-white p-3 text-center">
                 <h4 class="mb-0">{{ api_method.title }}</h4>
@@ -18,16 +20,16 @@
                 <p class="card-text" style="white-space: pre-wrap;">{{ api_method.description }}</p>
 
                 <!-- API Route -->
-                <h5 class="card-title">Route</h5>
+                <h5 class="card-title">{% trans 'Route' %}</h5>
                 <div class="bg-light p-3 m-2 rounded border">
                     <pre class="mb-0 language-python"><code>{{ api_method.route }}</code></pre>
                 </div>
-                <h5 class="card-title">Code Example</h5>
+                <h5 class="card-title">{% trans 'Code Example' %}</h5>
                 <div class="bg-light p-3 m-2 rounded border">
                     <pre class="mb-0 language-python" ><code>{{ api_method.test_code }}</code></pre>
                 </div>
 
-                <h5 class="card-title mt-4">Response</h5>
+                <h5 class="card-title mt-4">{% trans 'Response' %}</h5>
                 <div class="bg-light p-3 m-2 rounded border">
                     <pre class="mb-0 language-python" ><code>{{ api_method.code_result }}</code></pre>
                 </div>
@@ -35,7 +37,7 @@
                 <!-- Display sample image if available -->
                 {% if api_method.sample_image %}
                 <div class="mt-4">
-                    <h5 class="card-title">Sample Image</h5>
+                    <h5 class="card-title">{% trans 'Sample Image' %}</h5>
                     <div class="text-center">
                         <img src="{{ api_method.sample_image.url }}" alt="Sample Image" class="img-fluid rounded shadow-sm">
                     </div>
@@ -43,13 +45,13 @@
                 {% endif %}
 
                 <!-- API Parameters Table -->
-                <h5 class="card-title mt-4">Parameters</h5>
+                <h5 class="card-title mt-4">{% trans 'Parameters' %}</h5>
                 <div class="table-responsive">
                     <table class="table table-striped table-hover table-bordered">
                         <thead class="table-primary">
                             <tr>
-                                <th scope="col">Name</th>
-                                <th scope="col">Description</th>
+                                <th scope="col">{% trans 'Name' %}</th>
+                                <th scope="col">{% trans 'Description' %}</th>
                             </tr>
                         </thead>
                         <tbody class="table-group-divider">

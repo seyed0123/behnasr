@@ -33,6 +33,7 @@ class About_item(models.Model):
         choices=language_choices,
     )
     bootstrap_icon = models.CharField(max_length=100, blank=True, default='bi-diagram-3')
+    order = models.PositiveIntegerField(default=0)
 
 
 class Customer(models.Model):
@@ -49,6 +50,7 @@ class Service(models.Model):
     )
     bootstrap_icon = models.CharField(max_length=100, null=True, default='bi-easel')
     order = models.PositiveIntegerField(default=0)
+    hidden = models.BooleanField(default=False)
 
 
 class Product(models.Model):
@@ -61,6 +63,8 @@ class Product(models.Model):
     )
     image = models.ImageField(upload_to='media/products')
     category = models.CharField(max_length=50)
+    order = models.PositiveIntegerField(default=0)
+    hidden = models.BooleanField(default=False)
 
 
 class Member(models.Model):
@@ -73,6 +77,7 @@ class Member(models.Model):
     linkedin_link = models.CharField(max_length=250, null=True, blank=True)
     image = models.ImageField(upload_to='media/members')
     order = models.PositiveIntegerField(default=0)
+    hidden = models.BooleanField(default=False)
 
 
 class Pricing(models.Model):
@@ -83,6 +88,7 @@ class Pricing(models.Model):
         max_length=10,
         choices=language_choices,
     )
+    order = models.PositiveIntegerField(default=0)
 
 
 class Information(models.Model):
@@ -93,3 +99,4 @@ class Information(models.Model):
         max_length=10,
         choices=language_choices,
     )
+    order = models.PositiveIntegerField(default=0)

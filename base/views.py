@@ -11,14 +11,14 @@ def index(request):
         lang = 'en'
 
     company_obj = Company.objects.get(language=lang)
-    about_list = About_item.objects.filter(language=lang)
-    services = Service.objects.filter(language=lang).order_by('order')
-    products = Product.objects.filter(language=lang)
+    about_list = About_item.objects.filter(language=lang).order_by('order')
+    services = Service.objects.filter(language=lang, hidden=False).order_by('order')
+    products = Product.objects.filter(language=lang, hidden=False).order_by('order')
     categories = list(Product.objects.filter(language=lang).values('category').distinct())
-    members = Member.objects.filter(language=lang).order_by('order')
-    prices = Pricing.objects.filter(language=lang)
+    members = Member.objects.filter(language=lang, hidden=False).order_by('order')
+    prices = Pricing.objects.filter(language=lang).order_by('order')
     customers = Customer.objects.all()
-    informations = Information.objects.filter(language=lang)
+    informations = Information.objects.filter(language=lang).order_by('order')
     api_methods = ApiMethod.objects.filter(language=lang)
 
     return render(request, f'index-{lang}.html',

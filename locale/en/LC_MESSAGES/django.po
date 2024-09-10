@@ -1,0 +1,110 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-09-10 17:21+0430\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: English <LL@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\apiwebsite\settings.py:138
+msgid "English"
+msgstr "English"
+
+#: .\apiwebsite\settings.py:139
+msgid "Persian"
+msgstr "Persian"
+
+msgid "Home"
+msgstr "Home"
+
+msgid "About"
+msgstr "About"
+
+msgid "Services"
+msgstr "Services"
+
+msgid "Portfolio"
+msgstr "Portfolio"
+
+msgid "Team"
+msgstr "Team"
+
+msgid "API"
+msgstr "API"
+
+msgid "Contact"
+msgstr "Contact"
+
+msgid "Welcome to"
+msgstr "Welcome to"
+
+msgid "Get Started"
+msgstr "Get Started"
+
+msgid "Find Out More"
+msgstr "Find Out More"
+
+msgid "API Methods"
+msgstr "API Methods"
+
+msgid "View"
+msgstr "View"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Logout"
+msgstr "Logout"
+
+msgid "API Documentation"
+msgstr "API Documentation"
+
+msgid "Code Example"
+msgstr "Code Example"
+
+msgid "Response"
+msgstr "Response"
+
+msgid "Sample Image"
+msgstr "Sample Image"
+
+msgid "Parameters"
+msgstr "Parameters"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Username"
+msgstr "Username"
+
+msgid "Password"
+msgstr "Password"
+
+msgid "Signup"
+msgstr "Signup"
+
+msgid "Password repeat"
+msgstr "Password repeat"
+
+msgid "Your Remaining Tokens"
+msgstr "Your Remaining Tokens"
+
+msgid "Your API Key"
+msgstr "Your API Key"

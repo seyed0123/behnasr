@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-
-{% block title %}Sing up{% endblock %}
+{% load i18n %}
+{% block title %}{% trans 'Signup' %}{% endblock %}
 {% block content %}
     <div class="container my-3 p-5 mx-auto bg-body-secondary">
         <div class="row">
-            <h2>Signup</h2>
+            <h2>{% trans 'Signup' %}</h2>
         </div>
 
         {% if form.non_field_errors %}
@@ -19,7 +19,7 @@
             {% csrf_token %}
             <div class="col-6">
                 <div class="form-group">
-                    {{ form.username.label_tag }}
+                    {% trans 'Username' %}:
                     {{ form.username }}
                     {% if form.username.errors %}
                         <div class="alert alert-danger mt-2">
@@ -32,7 +32,7 @@
             </div>
             <div class="col-6">
                 <div class="form-group">
-                    {{ form.password1.label_tag }}
+                    {% trans 'Password' %}:
                     {{ form.password1 }}
                    {% if form.password1.errors %}
                         <div class="alert alert-danger mt-2">
@@ -44,7 +44,7 @@
                 </div>
 
                 <div class="form-group">
-                    {{ form.password2.label_tag }}
+                    {% trans 'Password repeat' %}:
                     {{ form.password2 }}
                     {% if form.password2.errors %}
                         <div class="alert alert-danger mt-2">
@@ -55,7 +55,7 @@
                     {% endif %}
                 </div>
             </div>
-            <button type="submit" class="col-sm-2 col-3 btn btn-primary m-3">Signup</button>
+            <button type="submit" class="col-sm-2 col-3 btn btn-primary m-3">{% trans 'Signup' %}</button>
         </form>
     </div>
 {% endblock %}
