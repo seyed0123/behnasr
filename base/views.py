@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from django.utils import translation
 
 from api.models import ApiMethod
 from .models import *
@@ -6,9 +7,9 @@ from .models import *
 
 # Create your views here.
 def index(request):
-    lang = request.GET.get('lang', 'en')
+    lang = translation.get_language()
     if lang not in [p[0] for p in language_choices]:
-        lang = 'en'
+        lang = 'fa'
 
     company_obj = Company.objects.get(language=lang)
     about_list = About_item.objects.filter(language=lang).order_by('order')
@@ -28,7 +29,7 @@ def index(request):
 
 
 def view_product(request, pk=None):
-    lang = request.GET.get('lang', 'en')
+    lang = translation.get_language()
     if lang not in [p[0] for p in language_choices]:
         lang = 'en'
     product = get_object_or_404(Product, pk=pk)

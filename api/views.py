@@ -13,7 +13,7 @@ from apiwebsite import settings
 from .forms import *
 from .models import *
 from base.models import Company
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -30,9 +30,9 @@ def active_lang(req, html, content, lang):
 # Create your views here.
 
 def signup(request):
-    lang = request.GET.get('lang', 'en')
+    lang = translation.get_language()
     if lang not in [p[0] for p in language_choices]:
-        lang = 'en'
+        lang = 'fa'
     api_methods = ApiMethod.objects.filter(language=lang)
     company_obj = Company.objects.get(language=lang)
     if request.method == 'POST':
@@ -43,14 +43,14 @@ def signup(request):
             return redirect('login')
     else:
         form = SignupForm()
-    return active_lang(request, 'signup.html',
-                       {'form': form, 'company': company_obj, 'api_methods': api_methods, 'lang': lang}, lang)
+    return render(request, 'signup.html',
+                  {'form': form, 'company': company_obj, 'api_methods': api_methods, 'lang': lang})
 
 
 def login(request):
-    lang = request.GET.get('lang', 'en')
+    lang = translation.get_language()
     if lang not in [p[0] for p in language_choices]:
-        lang = 'en'
+        lang = 'fa'
     api_methods = ApiMethod.objects.filter(language=lang)
     company_obj = Company.objects.get(language=lang)
     if request.method == 'POST':
@@ -62,8 +62,8 @@ def login(request):
             return redirect(next_url)
     else:
         form = LoginForm()
-    return active_lang(request, 'login.html',
-                       {'form': form, 'company': company_obj, 'api_methods': api_methods, 'lang': lang}, lang)
+    return render(request, 'login.html',
+                  {'form': form, 'company': company_obj, 'api_methods': api_methods, 'lang': lang})
 
 
 def logout_view(request):
@@ -73,14 +73,14 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-    lang = request.GET.get('lang', 'en')
+    lang = translation.get_language()
     if lang not in [p[0] for p in language_choices]:
-        lang = 'en'
+        lang = 'fa'
     company_obj = Company.objects.get(language=lang)
     api_methods = ApiMethod.objects.filter(language=lang)
     userAPI = UserAPI.objects.get(user=request.user)
-    return active_lang(request, 'profile.html',
-                       {'userAPI': userAPI, 'company': company_obj, 'api_methods': api_methods, 'lang': lang}, lang)
+    return render(request, 'profile.html',
+                  {'userAPI': userAPI, 'company': company_obj, 'api_methods': api_methods, 'lang': lang})
 
 
 def convert_image_to_numpy_array(image_file):
@@ -132,24 +132,36 @@ def classify(request):
 
 
 def method(request, pk):
-    lang = request.GET.get('lang', 'en')
+    lang = translation.get_language()
     if lang not in [p[0] for p in language_choices]:
-        lang = 'en'
+        lang = 'fa'
     api_method = get_object_or_404(ApiMethod, pk=pk)
     company_obj = Company.objects.get(language=lang)
     api_methods = ApiMethod.objects.filter(language=lang)
     key = UserAPI.objects.get(user=request.user).key
 
-    return active_lang(request, 'document.html',
-                       {'company': company_obj, 'api_method': api_method, 'api_methods': api_methods, 'key': key,
-                        'lang': lang}, lang)
+    return render(request, 'document.html',
+                  {'company': company_obj, 'api_method': api_method, 'api_methods': api_methods, 'key': key,
+                   'lang': lang})
 
 
 def api_method_list(request):
-    lang = request.GET.get('lang', 'en')
+    lang = translation.get_language()
     if lang not in [p[0] for p in language_choices]:
-        lang = 'en'
+        lang = 'fa'
     company_obj = Company.objects.get(language=lang)
     api_methods = ApiMethod.objects.filter(language=lang)
-    return active_lang(request, 'api_list.html', {'company': company_obj, 'api_methods': api_methods, 'lang': lang},
-                       lang)
+    return render(request, 'api_list.html', {'company': company_obj, 'api_methods': api_methods, 'lang': lang})
+
+
+def active_language(request, lang):
+    # Activate the requested language for the current request
+    translation.activate(lang)
+
+    # Create a response to redirect to the previous page
+    response = HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+    # Set the language cookie (this will persist the language choice)
+    response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang)
+
+    return response

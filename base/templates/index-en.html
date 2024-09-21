@@ -58,18 +58,18 @@
             <li><a href="#services">Services</a></li>
             <li><a href="#portfolio">Portfolio</a></li>
             <li><a href="#team">Team</a></li>
-            <li class="dropdown"><a href="{% url 'api_list' %}?lang={{ lang }}"><span>API</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <li class="dropdown"><a href="{% url 'api_list' %}"><span>API</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
               <ul>
                   {% for api_method in api_methods %}
-                      <li><a href="{% url 'view_method' api_method.pk %}?lang={{ lang }}">{{ api_method.title }}</a></li>
+                      <li><a href="{% url 'view_method' api_method.pk %}">{{ api_method.title }}</a></li>
                   {% endfor %}
               </ul>
             </li>
             <li><a href="#contact">Contact</a></li>
           <li class="dropdown"><a href=""><i class="bi bi-globe-americas toggle-dropdown"></i></a>
               <ul>
-               <li><a href="{{ request.path }}?lang=en">English</a></li>
-               <li><a href="{{ request.path }}?lang=fa">Persian</a></li>
+               <li><a href="{% url 'set_language' 'en' %}">English</a></li>
+               <li><a href="{% url 'set_language' 'fa' %}">Persian</a></li>
               </ul>
             </li>
           </ul>
@@ -115,7 +115,7 @@
                 <div class="col-xl-6 col-md-12 d-flex" data-aos="fade-up" data-aos-delay="100">
                     <div class="service-item position-relative">
                       <h4><a href="" class="stretched-link">{{ information.title}}</a></h4>
-                      <p>{{ information.description}}</p>
+                      <p>{{ information.description|safe }}</p>
                         <img class="img-fluid" src="{{ information.image.url }}">
                     </div>
                   </div><!-- End Service Item -->
@@ -162,20 +162,20 @@
 
           <div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="200">
             <div class="about-content ps-0 ps-lg-3">
-              <h3>{{ company.about_up }}</h3>
+              <h3>{{ company.about_up|safe }}</h3>
               <ul>
                   {% for about in about_list %}
                       <li>
                           <i class="bi {{ about.bootstrap_icon }}"></i>
                           <div>
                             <h4>{{ about.title}}</h4>
-                            <p>{{ about.text}}</p>
+                            <p>{{ about.text|safe }}</p>
                           </div>
                         </li>
                   {% endfor %}
               </ul>
               <p>
-                  {{ company.about_down }}
+                  {{ company.about_down|safe }}
               </p>
             </div>
 
@@ -294,7 +294,7 @@
                       <a href="#" class="stretched-link">
                         <h3>{{ service.title}}</h3>
                       </a>
-                      <p>{{ service.description}}</p>
+                      <p>{{ service.description|safe }}</p>
                     </div>
                   </div><!-- End Service Item -->
             {% endfor %}
@@ -456,8 +456,8 @@
                     <div class="col-md-8">
                       <div class="card-body">
                         <h5 class="card-title">{{ product.title}}</h5>
-                        <p class="card-text">{{ product.short_description}}</p>
-                          <p class="card-text mt-auto"><a href="{% url 'view_product' product.pk %}?lang={{ lang }}" title="More Details" class="details-link"><button class="btn btn-outline-secondary">View</button></a></p>
+                        <p class="card-text">{{ product.short_description|safe }}</p>
+                          <p class="card-text mt-auto"><a href="{% url 'view_product' product.pk %}" title="More Details" class="details-link"><button class="btn btn-outline-secondary">View</button></a></p>
                       </div>
                     </div>
                   </div>
@@ -524,9 +524,11 @@
                 <div class="col-xl-3 col-lg-6" data-aos="fade-up" data-aos-delay="100">
                 <div class="pricing-item">
                   <h3>{{ price.title }}</h3>
-                  <h4><sup>$</sup>{{ price.price }}<span>/per page</span></h4>
+                    {% if price.price %}
+                        <h4><sup>$</sup>{{ price.price }}<span>/per page</span></h4>
+                    {% endif %}
                   <p>
-                    {{ price.description}}
+                    {{ price.description|safe }}
                   </p>
                   <div class="btn-wrap">
                     <a href="#"><button class="btn" disabled>Buy Now</button></a>
@@ -656,8 +658,8 @@
                 </div>
               </div><!-- End Info Item -->
 
-              <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d15032.135368746127!2d57.08801085401049!3d30.26181551362918!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s!4v1724528802351!5m2!1sen!2s" frameborder="0" style="border:0; width: 100%; height: 270px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-            </div>
+              <div style="width: 100%"><iframe width="100%" height="600" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=bahonar%20university%20,%20kerman,iran+(behnasr)&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"><a href="https://www.gps.ie/">gps systems</a></iframe></div>
+               </div>
           </div>
 
 {#          <div class="col-lg-7">#}
@@ -726,7 +728,7 @@
     <div class="container footer-top">
       <div class="row gy-4">
         <div class="col-lg-4 col-md-6 footer-about">
-          <a href="{% url 'index' %}?lang={{ lang }}" class="d-flex align-items-center">
+          <a href="{% url 'index' %}" class="d-flex align-items-center">
             <span class="sitename">{{ company.name }}</span>
           </a>
           <div class="footer-contact pt-3">

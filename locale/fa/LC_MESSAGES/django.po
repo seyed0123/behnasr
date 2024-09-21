@@ -68,10 +68,13 @@ msgid "Logout"
 msgstr "خروج"
 
 msgid "API Documentation"
-msgstr "API   توضیحات "
+msgstr "    توضیحات  "
 
 msgid "Code Example"
 msgstr "نمونه کد"
+
+msgid "Route"
+msgstr "مسیر"
 
 msgid "Response"
 msgstr "پاسخ نمونه"

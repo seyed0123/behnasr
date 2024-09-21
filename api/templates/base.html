@@ -23,8 +23,21 @@
 
   <!-- Main CSS File -->
     <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+    <style>
+        /* Default Left-to-Right (LTR) styles */
+        .ltr {
+            text-align: left;
+            direction: ltr;
+        }
+
+        /* Right-to-Left (RTL) styles for Persian */
+        .rtl {
+            text-align: right;
+            direction: rtl;
+        }
+    </style>
 </head>
-<body>
+<body {% if lang == 'fa' %}class="rtl" {% else %}class="ltr"{% endif %}>
 
     <header id="header" class="header sticky-top">
 
@@ -40,24 +53,24 @@
         <nav id="navmenu" class="navmenu">
           <ul>
               {% if not user.is_authenticated %}
-                <li><a href="{% url 'login' %}?lang={{ lang }}">{% trans 'Login' %}</a></li>
-                <li><a href="{% url 'signup' %}?lang={{ lang }}">{% trans 'Signup' %}</a></li>
+                <li><a href="{% url 'login' %}">{% trans 'Login' %}</a></li>
+                <li><a href="{% url 'signup' %}">{% trans 'Signup' %}</a></li>
               {% else %}
-                  <li><a href="{% url 'logout' %}?lang={{ lang }}">({{ user.username }}) {% trans "Logout" %}</a></li>
-                  <li><a href="{% url 'dashboard' %}?lang={{ lang }}">{% trans 'Dashboard' %}</a></li>
+                  <li><a href="{% url 'logout' %}">({{ user.username }}) {% trans "Logout" %}</a></li>
+                  <li><a href="{% url 'dashboard' %}">{% trans 'Dashboard' %}</a></li>
               {% endif %}
-            <li class="dropdown"><a href="{% url 'api_list' %}?lang={{ lang }}"><span>API</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <li class="dropdown"><a href="{% url 'api_list' %}"><span>API</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
               <ul>
                   {% for api_method in api_methods %}
-                      <li><a href="{% url 'view_method' api_method.pk %}?lang={{ lang }}">{{ api_method.title }}</a></li>
+                      <li><a href="{% url 'view_method' api_method.pk %}">{{ api_method.title }}</a></li>
                   {% endfor %}
               </ul>
             </li>
-           <li><a href="{% url 'index' %}?lang={{ lang }}">{% trans 'Home' %}</a></li>
+           <li><a href="{% url 'index' %}">{% trans 'Home' %}</a></li>
           <li class="dropdown"><a href=""><i class="bi bi-globe-americas toggle-dropdown"></i></a>
               <ul>
-               <li><a href="{{ request.path }}?lang=en">{% trans 'English' %}</a></li>
-               <li><a href="{{ request.path }}?lang=fa">{% trans 'Persian' %}</a></li>
+               <li><a href="{% url 'set_language' 'en' %}">{% trans 'English' %}</a></li>
+               <li><a href="{% url 'set_language' 'fa' %}">{% trans 'Persian' %}</a></li>
               </ul>
             </li>
           </ul>

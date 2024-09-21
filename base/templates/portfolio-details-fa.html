@@ -27,9 +27,22 @@
 
   <!-- Main CSS File -->
   <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+        <style>
+        /* Default Left-to-Right (LTR) styles */
+        body {
+            text-align: left;
+            direction: ltr;
+        }
+
+        /* Right-to-Left (RTL) styles for Persian */
+        body.rtl {
+            text-align: right;
+            direction: rtl;
+        }
+    </style>
 </head>
 
-<body class="portfolio-details-page">
+<body class="portfolio-details-page rtl">
 
   <header id="header" class="header sticky-top">
 
@@ -44,10 +57,10 @@
 
         <nav id="navmenu" class="navmenu">
           <ul class="mx-5">
-            <li class="dropdown"><a href="{% url 'api_list' %}?lang={{ lang }}"><span>API</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <li class="dropdown"><a href="{% url 'api_list' %}"><span>API</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
               <ul>
                   {% for api_method in api_methods %}
-                      <li><a href="{% url 'view_method' api_method.pk %}?lang={{ lang }}">{{ api_method.title }}</a></li>
+                      <li><a href="{% url 'view_method' api_method.pk %}">{{ api_method.title }}</a></li>
                   {% endfor %}
               </ul>
             </li>
@@ -95,12 +108,12 @@
               <ul>
                 <li><strong>دسته بندی</strong>: {{product.category}}</li>
               </ul>
-                {{ product.short_description }}
+                {{ product.short_description|safe }}
             </div>
             <div class="portfolio-description" data-aos="fade-up" data-aos-delay="300">
               <h2>{{ product.title }}</h2>
               <p>
-                  {{ product.description }}
+                  {{ product.description|safe }}
               </p>
             </div>
           </div>
@@ -135,7 +148,7 @@
     <div class="container footer-top">
       <div class="row gy-4">
         <div class="col-lg-4 col-md-6 footer-about">
-          <a href="{% url 'index' %}?lang={{ lang }}" class="d-flex align-items-center">
+          <a href="{% url 'index' %}" class="d-flex align-items-center">
             <span class="sitename">{{ company.name }}</span>
           </a>
           <div class="footer-contact pt-3">
@@ -148,10 +161,10 @@
         <div class="col-lg-2 col-md-3 footer-links">
           <h4>لینک های مفید</h4>
           <ul>
-            <li><i class="bi bi-chevron-right"></i> <a href="{% url 'index' %}?lang={{ lang }}#hero">خانه</a></li>
-            <li><i class="bi bi-chevron-right"></i> <a href="{% url 'index' %}?lang={{ lang }}#about">درباره</a></li>
-            <li><i class="bi bi-chevron-right"></i> <a href="{% url 'index' %}?lang={{ lang }}#services">سرویس ها</a></li>
-            <li><i class="bi bi-chevron-right"></i> <a href="{% url 'index' %}?lang={{ lang }}#pricing">هزینه ها</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="{% url 'index' %}#hero">خانه</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="{% url 'index' %}}#about">درباره</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="{% url 'index' %}#services">سرویس ها</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="{% url 'index' %}#pricing">هزینه ها</a></li>
           </ul>
         </div>
 

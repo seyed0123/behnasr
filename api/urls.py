@@ -9,4 +9,5 @@ urlpatterns = [
     path('endpoint/', views.classify, name='endpoint'),
     path('method/<int:pk>/', views.method, name='view_method'),
     path('', views.api_method_list, name='api_list'),
+    path('set-language/<str:lang>/', views.active_language, name='set_language'),
 ]

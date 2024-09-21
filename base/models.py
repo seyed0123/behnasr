@@ -25,6 +25,15 @@ class Company(models.Model):
     video = models.FileField(upload_to='media/', blank=True, null=True)
 
 
+class Category(models.Model):
+    title = models.CharField(max_length=250)
+    language = models.CharField(
+        max_length=10,
+        choices=language_choices,
+    )
+    def __str__(self):
+        return self.title
+
 class About_item(models.Model):
     title = models.CharField(max_length=250)
     text = models.TextField(max_length=250)
@@ -62,7 +71,7 @@ class Product(models.Model):
         choices=language_choices,
     )
     image = models.ImageField(upload_to='media/products')
-    category = models.CharField(max_length=50)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     order = models.PositiveIntegerField(default=0)
     hidden = models.BooleanField(default=False)
 
@@ -83,7 +92,7 @@ class Member(models.Model):
 class Pricing(models.Model):
     title = models.CharField(max_length=250)
     description = models.TextField(max_length=1024)
-    price = models.FloatField(blank=True)
+    price = models.FloatField(blank=True, null=True)
     language = models.CharField(
         max_length=10,
         choices=language_choices,

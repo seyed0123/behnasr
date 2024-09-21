@@ -17,21 +17,21 @@
             </div>
             <div class="card-body">
                  <!-- Description -->
-                <p class="card-text" style="white-space: pre-wrap;">{{ api_method.description }}</p>
+                <p class="card-text" style="white-space: pre-wrap;">{{ api_method.description|safe }}</p>
 
                 <!-- API Route -->
                 <h5 class="card-title">{% trans 'Route' %}</h5>
                 <div class="bg-light p-3 m-2 rounded border">
-                    <pre class="mb-0 language-python"><code>{{ api_method.route }}</code></pre>
+                    <pre class="mb-0 language-python ltr"><code>{{ api_method.route }}</code></pre>
                 </div>
                 <h5 class="card-title">{% trans 'Code Example' %}</h5>
                 <div class="bg-light p-3 m-2 rounded border">
-                    <pre class="mb-0 language-python" ><code>{{ api_method.test_code }}</code></pre>
+                    <pre class="mb-0 language-python ltr" ><code>{{ api_method.test_code }}</code></pre>
                 </div>
 
                 <h5 class="card-title mt-4">{% trans 'Response' %}</h5>
                 <div class="bg-light p-3 m-2 rounded border">
-                    <pre class="mb-0 language-python" ><code>{{ api_method.code_result }}</code></pre>
+                    <pre class="mb-0 language-python ltr" ><code>{{ api_method.code_result }}</code></pre>
                 </div>
 
                 <!-- Display sample image if available -->
@@ -61,7 +61,7 @@
                                 <td>{{ param.name }}</td>
                                 <td>
                                     <div style="white-space: pre-wrap; word-wrap: break-word;" class="text-left">
-                                        {{ param.description }}
+                                        {{ param.description|safe }}
                                     </div>
                                 </td>
                             </tr>
@@ -72,90 +72,4 @@
             </div>
         </div>
     </div>
-    {% if user.is_authenticated %}
-        <div class="container my-5 p-3 bg-body-secondary shadow">
-            <h2 class="text-center">Test the {{ api_method.title }} Api</h2>
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <form id="uploadForm">
-                        <div class="mb-3">
-                            <label for="imageUpload" class="form-label">Select an Image</label>
-                            <input class="form-control" type="file" id="imageUpload" accept="image/*" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Upload</button>
-                    </form>
-                </div>
-            </div>
-            <div class="row justify-content-center mt-4">
-                <div id="result" class="col-md-6 text-center">
-                    <!-- Processed images will be displayed here -->
-                </div>
-            </div>
-        </div>
-    {% endif %}
-{% endblock %}
-{% block js %}
-<script src="{% static 'prism.js' %}"></script>
-    <script>
-        $(document).ready(function() {
-    $('#uploadForm').on('submit', function(event) {
-        event.preventDefault();
-
-        const fileInput = $('#imageUpload')[0];
-        const file = fileInput.files[0];
-        const formData = new FormData();
-        formData.append('image', file);
-        formData.append('method', '{{api_method.title}}'); // Include the method parameter
-
-        // Show a Bootstrap spinner during the upload process
-        const resultDiv = $('#result');
-        resultDiv.html(`
-            <div class="d-flex justify-content-center">
-                <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
-        `);
-
-        $.ajax({
-            url: 'http://localhost:8000/api/endpoint/',
-            type: 'POST',
-            data: formData,
-            contentType: false,
-            processData: false,
-            xhrFields: {
-                responseType: 'blob'
-            },
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('method', '{{api_method.title  }}');
-                xhr.setRequestHeader('Authorization', 'Token {{key}}');
-            },
-            success: function(blob) {
-                resultDiv.empty();
-                const processedImg = $('<img>').addClass('img-fluid mt-2').attr('alt', 'Processed Image');
-                const processedURL = URL.createObjectURL(blob);
-                processedImg.attr('src', processedURL);
-                resultDiv.append('<h5>Processed Image:</h5>').append(processedImg);
-
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.log(jqXHR, textStatus, errorThrown);
-
-                // Display the error on the page
-                const errorMessage = `
-                    <p class="text-danger">An error occurred while processing the image:</p>
-                    <ul class="text-danger">
-                        <li>Status: ${jqXHR.status}</li>
-                        <li>Status Text: ${jqXHR.statusText}</li>
-                        <li>Error Thrown: ${errorThrown}</li>
-                        <li>Response Text: ${jqXHR.responseText}</li>
-                    </ul>
-                `;
-                resultDiv.html(errorMessage);
-            }
-        });
-    });
-});
-
-    </script>
 {% endblock %}

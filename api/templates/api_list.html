@@ -21,9 +21,9 @@
                     <div class="col-md-8">
                       <div class="card-body">
                         <h5 class="card-title">{{ api_method.title }}</h5>
-                        <p class="card-text" style="white-space: pre-wrap;">{{ api_method.description }}</p>
+                        <p class="card-text" style="white-space: pre-wrap;">{{ api_method.description|safe }}</p>
                         <p class="card-button">
-                          <a href="{% url 'view_method' api_method.pk %}?lang={{ lang }}">
+                          <a href="{% url 'view_method' api_method.pk %}">
                             <button class="btn btn-outline-primary">{% trans 'View' %}</button>
                           </a>
                         </p>

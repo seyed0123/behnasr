@@ -26,6 +26,9 @@ class ApiMethod(models.Model):
     code_result = models.TextField(max_length=512)
     sample_image = models.ImageField(upload_to='media/apiSample', null=True)
 
+    def __str__(self):
+        return self.title
+
 
 class ApiParam(models.Model):
     api_method = models.ForeignKey(ApiMethod, on_delete=models.CASCADE)
@@ -35,3 +38,6 @@ class ApiParam(models.Model):
     )
     name = models.TextField(max_length=50)
     description = models.TextField(max_length=512)
+
+    def __str__(self):
+        return self.name + ' ->     ' + self.description
