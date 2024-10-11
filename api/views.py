@@ -138,10 +138,10 @@ def method(request, pk):
     api_method = get_object_or_404(ApiMethod, pk=pk)
     company_obj = Company.objects.get(language=lang)
     api_methods = ApiMethod.objects.filter(language=lang)
-    key = UserAPI.objects.get(user=request.user).key
+    # key = UserAPI.objects.get(user=request.user).key
 
     return render(request, 'document.html',
-                  {'company': company_obj, 'api_method': api_method, 'api_methods': api_methods, 'key': key,
+                  {'company': company_obj, 'api_method': api_method, 'api_methods': api_methods,
                    'lang': lang})
 
 
