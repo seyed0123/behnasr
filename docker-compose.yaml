@@ -10,7 +10,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   web:
-    image: seyed0123/webapiserver:v1
+    image: seyed0123/webapiserver:v2
     command: >
       sh -c "python manage.py migrate &&
              python manage.py collectstatic --noinput &&
