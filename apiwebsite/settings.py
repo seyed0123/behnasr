@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-t!)&3dyh8zi3c&yu8%fhdpm8miy5ie%s#2m#7^$2y$orz8u+6a"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ["https://behnasr.com"]
+ALLOWED_HOSTS = ["https://behnasr.com", "localhost"]
 
 
 # Application definition
@@ -83,13 +83,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'api_website',
-        'USER': 'seyed',
-        'PASSWORD': 'qwe!@#poi',
-        'HOST': 'db',
+        'USER': 'postgres',
+        'PASSWORD': 'seyed0123',
+        'HOST': 'localhost',
         'PORT': '5432'
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

@@ -8,6 +8,8 @@ services:
       POSTGRES_PASSWORD: qwe!@#poi
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
   web:
     image: seyed0123/webapiserver:v2

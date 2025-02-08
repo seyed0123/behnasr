@@ -51,6 +51,7 @@
                         <thead class="table-primary">
                             <tr>
                                 <th scope="col">{% trans 'Name' %}</th>
+                                <th scope="col">{% trans 'Type' %}</th>
                                 <th scope="col">{% trans 'Description' %}</th>
                             </tr>
                         </thead>
@@ -59,6 +60,7 @@
                             {% for param in api_method.apiparam_set.all %}
                             <tr>
                                 <td>{{ param.name }}</td>
+                                <td>{{ param.type }}</td>
                                 <td>
                                     <div style="white-space: pre-wrap; word-wrap: break-word;" class="text-left">
                                         {{ param.description|safe }}

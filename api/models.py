@@ -37,6 +37,15 @@ class ApiParam(models.Model):
         choices=language_choices,
     )
     name = models.TextField(max_length=50)
+    type = models.CharField(
+        choices=(
+            ('Number', 'Number field'),
+            ('String', 'Text Field'),
+            ('Radio', 'Radio Button'),
+            ('Check', 'Check Box'),
+            ('Image', 'Image field'),
+        )
+    )
     description = models.TextField(max_length=512)
 
     def __str__(self):

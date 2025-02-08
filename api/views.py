@@ -1,6 +1,7 @@
 import io
 
 import numpy as np
+import requests
 from PIL import Image
 from io import BytesIO
 from django.contrib.auth.decorators import login_required
@@ -18,6 +19,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import authentication_classes, permission_classes, api_view
+
+flask_url = "http://localhost:5000"
 
 
 def active_lang(req, html, content, lang):
@@ -83,52 +86,68 @@ def dashboard(request):
                   {'userAPI': userAPI, 'company': company_obj, 'api_methods': api_methods, 'lang': lang})
 
 
-def convert_image_to_numpy_array(image_file):
-    image = Image.open(image_file)
+def get_api_param(request):
+    if request.method == 'POST':
+        try:
+            api_id = request.POST.get('api_id')
+            if not api_id:
+                return JsonResponse({'error': 'API ID is required.'}, status=400)
+            api_method = get_object_or_404(ApiMethod, pk=api_id)
+            api_params = ApiParam.objects.filter(api_method=api_method, language=api_method.language)
+            param_list = [
+                {
+                    'id': param.id,
+                    'name': param.name,
+                    'description': param.description,
+                    'type': param.type,
+                }
+                for param in api_params
+            ]
+            return JsonResponse({'api_params': param_list})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
-    image_array = np.array(image)
 
-    return image_array
+def check_tokens(user):
+    userAPI = UserAPI.objects.get(user=user)
+    if userAPI.tokens <= 0:
+        return False
+
+    userAPI.tokens -= 1
+    userAPI.save()
+    return True
 
 
 @csrf_exempt
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def classify(request):
+def post_ocr(request):
     user = request.user
-    # Check if the image is in the request
-    image = request.FILES.get('image')
-    if not image:
-        return JsonResponse({'error': 'No image provided.'}, status=400)
-    image_array = convert_image_to_numpy_array(image)
-    # Check if the method is in the request
-    method = request.POST.get('method')
-    # if not method:
-    #     return JsonResponse({'error': 'No method provided.'}, status=400)
-
-    # TODO: parse the params and call the classify method and make a valid json response in the dict format
-    res = {'shape': image_array.shape, 'method': method}
-
-    userAPI = UserAPI.objects.get(user=user)
-    if userAPI.tokens <= 0:
+    if not check_tokens(user):
         return JsonResponse({'error': 'Insufficient tokens.'}, status=403)
 
-    userAPI.tokens -= 1
-    userAPI.save()
-    # Process the image and method here
-    # Example: save the image, perform an action based on the method, etc.
-    processed_image = Image.fromarray(image_array)
-    buf = io.BytesIO()
-    processed_image.save(buf, format='PNG')
-    image_bytes = buf.getvalue()
+    # Send the request to Flask
+    response = requests.post(flask_url + "/ocr", files=request.FILES, data=request.POST)
 
-    # Create a response that includes the image and additional data
-    response = HttpResponse(image_bytes, content_type='image/png')
-    response['Shape'] = res['shape']  # Example of adding extra data to headers
-    response['Method'] = res['method']
+    # Return the result to the user
+    return JsonResponse(response.json())
 
-    return response
+
+@csrf_exempt
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def post_classify(request):
+    user = request.user
+    if not check_tokens(user):
+        return JsonResponse({'error': 'Insufficient tokens.'}, status=403)
+
+    # Send the request to Flask
+    response = requests.post(flask_url + "/classify", files=request.FILES, data=request.POST)
+
+    # Return the result to the user
+    return JsonResponse(response.json())
 
 
 def method(request, pk):
@@ -165,3 +184,14 @@ def active_language(request, lang):
     response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang)
 
     return response
+
+
+@login_required()
+def demo_page(request):
+    user = request.user
+    lang = translation.get_language()
+    if lang not in [p[0] for p in language_choices]:
+        lang = 'fa'
+    api_methods = ApiMethod.objects.filter(language=lang)
+    key = UserAPI.objects.get(user=user).key
+    return render(request, 'demo.html', {'api_methods': api_methods, 'key': key})
