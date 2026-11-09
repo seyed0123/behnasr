@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}
+    {% trans 'Api List' %}
+
+{% endblock %}
+{% block content %}
+<div class="container my-5">
+        <h1 class="mb-4 text-center text-primary">{% trans 'API Methods' %}</h1>
+
+        <!-- Ensure this is inside a container -->
+        <div class="row">
+            <!-- Loop through all ApiMethods -->
+            {% for api_method in api_methods %}
+            <div class="col-md-6 mb-4">
+                <div class="card mb-3 h-100">
+                  <div class="row g-0">
+                    <div class="col-md-4">
+                      <img src="{{ api_method.sample_image.url }}" class="img-fluid rounded-start img-thumbnail" alt="{{ api_method.title }}">
+                    </div>
+                    <div class="col-md-8">
+                      <div class="card-body">
+                        <h5 class="card-title">{{ api_method.title }}</h5>
+                        <p class="card-text" style="white-space: pre-wrap;">{{ api_method.description|safe }}</p>
+                        <p class="card-button">
+                          <a href="{% url 'view_method' api_method.pk %}">
+                            <button class="btn btn-outline-primary">{% trans 'View' %}</button>
+                          </a>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

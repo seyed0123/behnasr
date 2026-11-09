@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans 'Login' %}{% endblock %}
+{% block content %}
+    <div class="container my-3 p-5 mx-auto bg-body-secondary">
+        <div class="row">
+            <h2>{% trans 'Login' %}</h2>
+        </div>
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form class="row" method="post">
+            {% csrf_token %}
+            <div class="col-6">
+                <div class="form-group">
+                    {% trans 'Username' %}:
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="alert alert-danger mt-2">
+                            {% for error in form.username.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    {% trans 'Password' %}:
+                    {{ form.password }}
+                   {% if form.password.errors %}
+                        <div class="alert alert-danger mt-2">
+                            {% for error in form.password.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <button type="submit" class="col-sm-2 col-3 btn btn-primary m-3">{% trans 'Login' %}</button>
+        </form>
+
+    </div>
+{% endblock %}

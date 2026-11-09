@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}
+    {% trans 'Demo' %}
+{% endblock %}
+{% block extra_head %}
+<style>
+    .method-item {
+        cursor: pointer;
+        transition: all 0.3s ease; /* Smooth transition */
+    }
+
+    .expanded {
+        padding: 20px;
+        font-size: large; /* Larger font size */
+        background-color: #d1e7dd; /* Highlight color */
+        border: 2px solid #198754; /* Highlight border */
+    }
+</style>
+{% endblock %}
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Available API Methods</h1>
+
+        <!-- List of API Methods -->
+        <ul class="method-list list-group">
+            {% for method in api_methods %}
+            <li class="method-item list-group-item list-group-item-action" data-api-id="{{ method.id }}">
+                <strong>{{ method.title }}</strong> - {{ method.description }}
+                <h1 id="{{ method.id }}-route" style="display:none;">{{ method.route }}</h1>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Parameter Container -->
+        <div id="param-container" class="param-container mt-4">
+        </div>
+
+        <div id="result" class="container m-4">
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+<script src="{% static 'prism.js' %}"></script>
+    <script>
+    function extractFormData() {
+        const formData = new FormData(); // For file inputs
+        const bodyData = {}; // For non-file inputs
+
+        // Iterate through all input elements in the form
+        $('#param-form').find('input, select, textarea').each(function () {
+            const $input = $(this);
+            const name = $input.attr('name'); // Get the input name
+            const value = $input.val(); // Get the input value
+
+            if ($input.is(':file')) { // Check if the input is a file type
+                if ($input[0].files.length > 0) {
+                    Array.from($input[0].files).forEach(file => {
+                        formData.append(name, file); // Append each file to FormData
+                    });
+                }
+            } else if ($input.is(':checkbox')) { // Handle checkboxes
+                if ($input.is(':checked')) {
+                    bodyData[name] = value; // Add checked checkbox values to bodyData
+                }
+            } else if ($input.is(':radio')) { // Handle radio buttons
+                if ($input.is(':checked')) {
+                    bodyData[name] = value; // Add selected radio button value to bodyData
+                }
+            } else if ($input.is('select') || $input.is('textarea')) { // Handle select and textarea
+                bodyData[name] = value;
+            } else {
+                bodyData[name] = value; // Add other input types to bodyData
+            }
+        });
+
+        return { formData, bodyData };
+    }
+
+    $(document).on('click', '#submit-button', function (event) {
+        event.preventDefault();
+
+        const { formData, bodyData } = extractFormData();
+
+
+        // Add the method parameter
+        const selected_div = $(`#selected-method`).text()
+        const methodRouteElement = $(`#${selected_div}-route`);
+        const methodRoute = methodRouteElement.text();
+        const baseUrl = window.location.origin+'/';
+
+        // Show a Bootstrap spinner during the upload process
+        const resultDiv = $('#result');
+        resultDiv.html(`
+            <div class="d-flex justify-content-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        `);
+        for (const key in bodyData) {
+            formData.append(key, bodyData[key]); // Append body data
+        }
+
+        // Send the AJAX request
+        $.ajax({
+            url: baseUrl+methodRoute,
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                xhr.setRequestHeader('Authorization', 'Token {{key}}');
+            },
+            success: function (response) {
+                resultDiv.empty();
+
+                if (response.outputImage) {
+                    const imageDiv = $('<div>').attr('class','card text-bg-dark')
+                    // Handle image response
+                    const processedImg = $('<img>')
+                        .addClass('card-img-top mt-2')
+                        .attr('alt', 'Processed Image')
+                        .attr('src', `data:image/png;base64,${response.outputImage}`)
+                        .css({
+                            'max-height': '800px', // Set a maximum height
+                            'max-width': '80%',   // Ensure the image doesn't exceed its container's width
+                        });
+                    const overlayDiv = $('<div>').attr('class','card-img-overlay')
+                    // Create a download button for the image
+                    const downloadButton = $('<a>')
+                        .addClass('btn btn-primary mt-2')
+                        .attr('href', `data:image/png;base64,${response.outputImage}`)
+                        .attr('download', 'processed_image.png')
+                        .text('Download Image');
+
+                    const header = $('<h5>').attr('class','card-title').text('Processed Image')
+                    overlayDiv.append(header,downloadButton)
+                    imageDiv.append(processedImg,overlayDiv)
+                    resultDiv.append(imageDiv)
+                }
+
+                const row = $('<div>').addClass('row');
+
+                for (const [key, value] of Object.entries(response)) {
+                    if(key==='outputImage') continue
+                    const col = $('<div>').addClass('col-md-6 m-3');
+                    const card = $('<div>').addClass('card');
+                    const cardBody = $('<div>').addClass('card-body');
+
+                    cardBody.append(
+                        $('<h5>').addClass('card-title').text(key),
+                        $('<p>').addClass('card-text').text(value)
+                    );
+
+                    card.append(cardBody);
+                    col.append(card);
+                    row.append(col);
+                }
+
+                resultDiv.append(row);
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR, textStatus, errorThrown);
+
+                // Display the error on the page
+                const errorMessage = `
+                    <p class="text-danger">An error occurred while processing the request:</p>
+                    <ul class="text-danger">
+                        <li>Status: ${jqXHR.status}</li>
+                        <li>Status Text: ${jqXHR.statusText}</li>
+                        <li>Error Thrown: ${errorThrown}</li>
+                        <li>Response Text: ${jqXHR.responseText}</li>
+                    </ul>
+                `;
+                resultDiv.html(errorMessage);
+            }
+        });
+    });
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            // Handle method item clicks
+            $('.method-item').on('click', function () {
+                $('.method-item').removeClass('expanded list-group-item-primary');
+                $(this).addClass('expanded');
+                $(this).addClass('list-group-item-primary')
+                $(this).removeClass('list-group-item-secondary');
+                $('#result').empty();
+                const apiId = $(this).data('api-id');
+                const method_name = $(this).find('strong').text().trim();
+                $('#param-container').empty(); // Clear previous params
+                $('#param-container').show(); // Show the container
+                const header = $('<h2>').text('Enter '+method_name+' Parameters')
+                const idDiv = $('<div>').attr('id','selected-method').attr('style','display:none;').text(apiId)
+                const form = $('<form>').attr('id','param-form')
+                const button = $('<button>')
+                .attr('id', 'submit-button')
+                .attr('type', 'button')
+                .addClass('btn btn-primary mt-3')
+                .text('Submit');
+                $('#param-container').append(header, form, button,idDiv);
+
+                // Fetch parameters using AJAX
+                $.ajax({
+                    url: '{% url "get_api_param" %}',
+                    type: 'POST',
+                    data: { api_id: apiId },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    },
+                    success: function (response) {
+                        if (response.api_params) {
+                            const form = $('#param-form');
+                            form.empty(); // Clear any existing fields
+
+                            // Create a row container for all parameters
+                            const row = $('<div>').addClass('row');
+
+                            response.api_params.forEach(param => {
+                                // Create a column for each parameter
+                                const col = $('<div>').addClass('col-md-6 mb-3'); // Use 6 columns per parameter for medium screens
+
+                                // Create a label for the parameter
+                                const label = $('<label>')
+                                    .text(`${param.name}`)
+                                    .attr('for', param.name);
+
+                                // Create an input field based on the parameter type
+                                let input;
+                                switch (param.type) {
+                                    case 'Number':
+                                        input = $('<input>')
+                                            .attr('type', 'number')
+                                            .attr('name', param.name)
+                                            .addClass('form-control'); // Add Bootstrap form control class
+                                        break;
+
+                                    case 'String':
+                                        input = $('<input>')
+                                            .attr('type', 'text')
+                                            .attr('name', param.name)
+                                            .addClass('form-control'); // Add Bootstrap form control class
+                                        break;
+
+                                    case 'Radio':
+                                        // Handle radio buttons as a group
+                                        const radioGroup = $('<div>').addClass('form-check'); // Use Bootstrap form-check class
+                                        const options = ['Option 1', 'Option 2', 'Option 3']; // Replace with actual options if needed
+                                        options.forEach(option => {
+                                            const radioDiv = $('<div>').addClass('form-check'); // Use Bootstrap form-check class
+                                            const radioInput = $('<input>')
+                                                .attr('type', 'radio')
+                                                .attr('name', param.name)
+                                                .val(option)
+                                                .addClass('form-check-input'); // Add Bootstrap form-check-input class
+                                            const radioLabel = $('<label>')
+                                                .text(option)
+                                                .addClass('form-check-label'); // Add Bootstrap form-check-label class
+                                            radioDiv.append(radioInput).append(radioLabel);
+                                            radioGroup.append(radioDiv);
+                                        });
+                                        input = radioGroup; // Set the radio group as the input
+                                        break;
+
+                                    case 'Check':
+                                        const checkDiv = $('<div>').addClass('form-check'); // Use Bootstrap form-check class
+                                        input = $('<input>')
+                                            .attr('type', 'checkbox')
+                                            .attr('name', param.name)
+                                            .addClass('form-check-input'); // Add Bootstrap form-check-input class
+                                        const checkLabel = $('<label>')
+                                            .text(param.name)
+                                            .addClass('form-check-label'); // Add Bootstrap form-check-label class
+                                        checkDiv.append(input).append(checkLabel);
+                                        break;
+
+                                    case 'Image':
+                                        input = $('<input>')
+                                            .attr('type', 'file')
+                                            .attr('name', param.name)
+                                            .attr('accept', 'image/*') // Restrict to image files
+                                            .addClass('form-control'); // Add Bootstrap form control class
+                                        break;
+
+                                    default:
+                                        input = $('<input>')
+                                            .attr('type', 'text') // Default to text if type is unknown
+                                            .attr('name', param.name)
+                                            .addClass('form-control'); // Add Bootstrap form control class
+                                        break;
+                                }
+
+                                // Append the label and input to the column (except for Radio and Checkbox)
+                                if (param.type === 'Radio' || param.type === 'Check') {
+                                    col.append(input); // Append only the input (which includes the label for Radio/Checkbox)
+                                } else {
+                                    col.append(label).append(input); // Append both label and input
+                                }
+
+                                // Append the column to the row
+                                row.append(col);
+                            });
+
+                            // Append the row to the form
+                            form.append(row);
+                        } else {
+                            alert('No parameters found for this method.');
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error(jqXHR, textStatus, errorThrown);
+                        alert('Error fetching parameters.');
+                    }
+                });
+            });
+
+            // Handle form submission
+            $('#submit-button').on('click', function () {
+                const formData = $('#param-form').serialize();
+                alert('Form Data: ' + formData); // Replace with actual submission logic
+            });
+        });
+    </script>
+{% endblock %}
